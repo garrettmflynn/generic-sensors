@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generic Devices</title>
+    <title>Generic Devices API</title>
     <style>
         html, body {
             height: 100vh;
@@ -48,7 +48,7 @@
 </head>
 <body>
     <section>
-        <h1>Generic Devices</h1>
+        <h1>Generic Devices API</h1>
         <div id="buttons"></div>
 
         <div>
@@ -63,95 +63,111 @@
 
     const frequency = 60
     
-    console.log('Creating devices array')
     const devices = [
         {
             name: 'Accelerometer',
-            class: Accelerometer,
+            class: window.Accelerometer,
             arguments: [{frequency}],
             fields: ['x', 'y', 'z']
         },
         {
             name: 'Linear Acceleration',
-            class: LinearAccelerationSensor,
+            class: window.LinearAccelerationSensor,
             arguments:  [{frequency}],
             fields: ['x', 'y', 'z']
         },
         {
             name: 'Gravity',
-            class: GravitySensor,
+            class: window.GravitySensor,
             arguments: [{frequency}],
             fields: ['x', 'y', 'z']
         },
         {
             name: 'Gyroscope',
-            class: Gyroscope,
+            class: window.Gyroscope,
             arguments: [{frequency}],
             fields: ['x', 'y', 'z']
         },
         {
             name: 'Relative Orientation',
-            class: RelativeOrientationSensor,
+            class: window.RelativeOrientationSensor,
             arguments: [{frequency}],
             fields: "quaternion"
         },
         {
             name: 'Relative Orientation (screen)',
-            class: RelativeOrientationSensor,
+            class: window.RelativeOrientationSensor,
             arguments: [{ frequency, referenceFrame: 'screen' }],
             fields: "quaternion"
         },
         {
             name: 'Absolute Orientation',
-            class: AbsoluteOrientationSensor,
+            class: window.AbsoluteOrientationSensor,
             arguments: [{frequency}],
             fields: "quaternion"
         },
         {
             name: 'Ambient Light',
-            class: AmbientLightSensor,
+            class: window.AmbientLightSensor,
             arguments: [{frequency: 10}],
             fields: 'illuminance'
         },
         {
             name: 'Magnetometer',
-            class: Magnetometer,
+            class: window.Magnetometer,
             arguments: [{frequency: 10}],
             fields: ['x', 'y', 'z']
         }
     ]
     console.log('Created devices array', devices)
 
+    const readout = document.getElementById('readout');
     const textarea = document.body.querySelector('textarea');
     const buttons = document.getElementById('buttons')
     const timestamp = document.getElementById('timestamp')
 
-    console.log('Got elements', textarea, buttons, timestamp)
 
     let sensor;
-    devices.forEach(o => {
-        const button = document.createElement('button')
-        console.log('Created button', o.name, button)
+    const availableDevices = devices.filter(o => !!o.class)
+    if (availableDevices.length > 0) {
+        availableDevices.forEach(o => {
 
-        button.innerText = o.name
-        button.onclick = async () => {
-            if (sensor) sensor.stop() // stop existing sensor
-            sensor = await create(o.class, ...o.arguments)
-            console.log('Sensor', sensor)
-            sensor.addEventListener('reading', (ev) => {
-                console.log(sensor)
+            if (o.class){
+                const button = document.createElement('button')
 
-                let info = {}
-                if (!Array.isArray(o.fields)) o.fields = [o.fields]
-                o.fields.forEach(k => info[k] = sensor[k])
+                button.innerText = o.name
+                button.onclick = async () => {
+                    let newSensor = await create(o.class, ...o.arguments).catch(e => {
+                        button.remove()
+                    })
+                    if (newSensor) {
+                        if (sensor) sensor.stop() // stop existing sensor
+                        sensor = newSensor
+                        sensor.addEventListener('reading', (ev) => {
+                            console.log(sensor)
 
-                textarea.value = JSON.stringify(info, null, 2)
+                            let info = {}
+                            if (!Array.isArray(o.fields)) o.fields = [o.fields]
+                            o.fields.forEach(k => info[k] = sensor[k])
 
-                timestamp.innerText = sensor.timestamp
-            })
-        }
-        buttons.appendChild(button)
-    })
+                            textarea.value = JSON.stringify(info, null, 2)
+
+                            timestamp.innerText = sensor.timestamp
+                        })
+                    }
+                }
+                buttons.appendChild(button)
+            }
+        })
+    } else {
+        const text = 'The Generic Sensors API is not supported on this browser.'
+        console.warn(text)
+        document.body.style.alignItems = 'center'
+        document.body.style.justifyContent = 'center'
+        document.body.style.display = 'flex'
+
+        document.body.innerHTML = text
+    }
 
 </script>
 </html>
