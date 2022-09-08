@@ -61,9 +61,9 @@
 <script type="module">
     import create from './create.js';
 
-    try {
     const frequency = 60
     
+    console.log('Creating devices array')
     const devices = [
         {
             name: 'Accelerometer',
@@ -120,14 +120,19 @@
             fields: ['x', 'y', 'z']
         }
     ]
+    console.log('Created devices array', devices)
 
     const textarea = document.body.querySelector('textarea');
     const buttons = document.getElementById('buttons')
     const timestamp = document.getElementById('timestamp')
 
+    console.log('Got elements', textarea, buttons, timestamp)
+
     let sensor;
     devices.forEach(o => {
         const button = document.createElement('button')
+        console.log('Created button', o.name, button)
+
         button.innerText = o.name
         button.onclick = async () => {
             if (sensor) sensor.stop() // stop existing sensor
@@ -147,9 +152,6 @@
         }
         buttons.appendChild(button)
     })
-} catch (e) {
-    console.log('Error', e)
-}
 
 </script>
 </html>
