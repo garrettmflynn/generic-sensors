@@ -61,6 +61,7 @@
 <script type="module">
     import create from './create.js';
 
+    try {
     const frequency = 60
     
     const devices = [
@@ -146,6 +147,9 @@
         }
         buttons.appendChild(button)
     })
+} catch (e) {
+    console.log('Error', e)
+}
 
 </script>
 </html>
