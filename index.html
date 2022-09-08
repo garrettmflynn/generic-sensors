@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+</body>
+
+<script type="module">
+    import create from './create.js';
+
+    const frequency = 60
+    
+    const devices = [
+        {
+            name: 'Accelerometer',
+            class: Accelerometer,
+            arguments: [{frequency}]
+        },
+        {
+            name: 'Linear Acceleration',
+            class: LinearAccelerationSensor,
+            arguments:  [{frequency}]
+        },
+        {
+            name: 'Gravity',
+            class: GravitySensor,
+            arguments: [{frequency}]
+        },
+        {
+            name: 'Gyroscope',
+            class: Gyroscope,
+            arguments: [{frequency}]
+        },
+        {
+            name: 'Relative Orientation',
+            class: RelativeOrientationSensor,
+            arguments: [{frequency}]
+        },
+        {
+            name: 'Relative Orientation (screen)',
+            class: RelativeOrientationSensor,
+            arguments: [{ frequency, referenceFrame: 'screen' }]
+        },
+        {
+            name: 'Absolute Orientation',
+            class: AbsoluteOrientationSensor,
+            arguments: [{frequency}]
+        },
+        {
+            name: 'Ambient Light',
+            class: AmbientLightSensor,
+            arguments: [{frequency: 10}]
+        },
+        {
+            name: 'Magnetometer',
+            class: Magnetometer,
+            arguments: [{frequency: 10}]
+        }
+    ]
+
+    devices.forEach(o => {
+        const button = document.createElement('button')
+        button.innerText = o.name
+        button.onclick = async () => {
+            let sensor = await create(o.class, ...o.arguments)
+            console.log('Sensor', sensor)
+            sensor.addEventListener('reading', (ev) => console.log(sensor))
+        }
+        document.body.appendChild(button)
+    })
+
+</script>
+</html>
