@@ -134,7 +134,6 @@
 
             if (o.class){
                 const button = document.createElement('button')
-
                 button.innerText = o.name
                 button.onclick = async () => {
                     let newSensor = await create(o.class, ...o.arguments).catch(e => {
@@ -160,11 +159,13 @@
             }
         })
     } else {
-        const text = 'The Generic Sensors API is not supported on this browser.'
+        const text = '<p>The Generic Sensors API is not supported on this browser.</p>'
         console.warn(text)
         document.body.style.alignItems = 'center'
         document.body.style.justifyContent = 'center'
         document.body.style.display = 'flex'
+        document.body.style.padding = '10px'
+        document.body.style.textAlign = 'center'
 
         document.body.innerHTML = text
     }
